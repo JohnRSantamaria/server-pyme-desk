@@ -50,3 +50,8 @@ Quien puede ver esto, o si debemos enviar una serie de autenticacion
 **Pruebas** https://server-pyme-desk.onrender.com/api/projects/
 
 # Rutas de Backend
+
+- api/clientes
+- api/productos
+- api/pedidos
+- api/resumen
