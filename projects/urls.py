@@ -3,7 +3,7 @@ from .api import ClienteViewSet, ProductoViewSet, PedidoViewSet, ResumenView
 from django.urls import path
 
 router = DefaultRouter()
-router.register('api/clientes', ClienteViewSet, 'clientes')
+router.register('api/usuarios', ClienteViewSet, 'usuarios')
 router.register('api/productos', ProductoViewSet, 'productos')
 router.register('api/pedidos', PedidoViewSet, 'pedidos')
 
