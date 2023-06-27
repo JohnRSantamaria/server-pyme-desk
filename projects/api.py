@@ -4,7 +4,7 @@ from .serializers import ClienteSerializer, ProductoSerializer, PedidoSerializer
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, ExpressionWrapper, DecimalField
 from datetime import datetime, timedelta
 
 
@@ -46,8 +46,10 @@ class ResumenView(APIView):
 
             # Ingresos del último mes
             fecha_un_mes_atras = datetime.now() - timedelta(days=30)
-            ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).aggregate(
-                total_ingresos=Sum('detallepedido__cantidad') * F('detallepedido__producto__precio'))['total_ingresos']
+            ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).annotate(
+                ingreso_por_producto=ExpressionWrapper(F('detallepedido__cantidad') * F(
+                    'detallepedido__producto__precio'), output_field=DecimalField())
+            ).aggregate(total_ingresos=Sum('ingreso_por_producto'))['total_ingresos']
 
             # Ciudad con más pedidos
             ciudad_mas_pedidos = Pedido.objects.values('cliente__ciudad').annotate(
