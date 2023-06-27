@@ -51,10 +51,21 @@ class ResumenView(APIView):
 
         # Ingresos del último mes
         fecha_un_mes_atras = datetime.now() - timedelta(days=30)
-        ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).annotate(
-            ingreso_por_producto=ExpressionWrapper(F('detallepedido__cantidad') * F(
-                'detallepedido__producto__precio'), output_field=DecimalField())
-        ).aggregate(total_ingresos=Sum('ingreso_por_producto'))['total_ingresos']
+
+        # ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).annotate(
+        #     ingreso_por_producto=ExpressionWrapper(F('detallepedido__cantidad') * F(
+        #         'detallepedido__producto__precio'), output_field=DecimalField())
+        # ).aggregate(total_ingresos=Sum('ingreso_por_producto'))['total_ingresos']
+
+        # Ingresos del último mes
+        fecha_un_mes_atras = datetime.now() - timedelta(days=30)
+        detalle_pedidos = DetallePedido.objects.filter(
+            pedido__fecha__gte=fecha_un_mes_atras,
+            pedido__pagado=True
+        )
+        ingresos_ultimo_mes = detalle_pedidos.aggregate(
+            total_ingresos=Sum(F('cantidad') * F('producto__precio'))
+        )['total_ingresos']
 
         # Ciudad con más pedidos
         ciudad_mas_pedidos = Pedido.objects.values('cliente__ciudad').annotate(

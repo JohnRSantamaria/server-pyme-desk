@@ -23,20 +23,6 @@ class DetallePedidoSerializer(serializers.ModelSerializer):
         }
 
 
-# class PedidoSerializer(serializers.ModelSerializer):
-#     productos = DetallePedidoSerializer(
-#         source='detallepedido_set', many=True, read_only=True)
-
-#     class Meta:
-#         model = Pedido
-#         fields = '__all__'
-
-#     def create(self, validated_data):
-#         productos_data = validated_data.pop('productos', [])
-#         pedido = Pedido.objects.create(**validated_data)
-#         for producto_data in productos_data:
-#             DetallePedido.objects.create(pedido=pedido, **producto_data)
-#         return pedido
 class PedidoSerializer(serializers.ModelSerializer):
     productos = DetallePedidoSerializer(
         source='detallepedido_set', many=True, read_only=True)
