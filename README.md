@@ -51,12 +51,12 @@ Quien puede ver esto, o si debemos enviar una serie de autenticacion
 
 # Rutas de Backend
 
-- api/clientes
+- api/Usuarios
 - api/productos
 - api/pedidos
 - api/resumen
 
-- https://server-pyme-desk.onrender.com/api/clientes/
+- https://server-pyme-desk.onrender.com/api/usuarios/
 - https://server-pyme-desk.onrender.com/api/productos/
 - https://server-pyme-desk.onrender.com/api/pedidos/
 - https://server-pyme-desk.onrender.com/api/resumen/
