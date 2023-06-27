@@ -1,3 +1,4 @@
+from rest_framework.exceptions import APIException
 from .models import Cliente, Producto, Pedido, DetallePedido
 from .serializers import ClienteSerializer, ProductoSerializer, PedidoSerializer
 from rest_framework import viewsets, permissions, status
@@ -36,29 +37,63 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
 class ResumenView(APIView):
     def get(self, request):
-        # Número de pedidos
-        num_pedidos = Pedido.objects.count()
+        try:
+            # Número de pedidos
+            num_pedidos = Pedido.objects.count()
 
-        # Número de clientes
-        num_clientes = Cliente.objects.count()
+            # Número de clientes
+            num_clientes = Cliente.objects.count()
 
-        # Ingresos del último mes
-        fecha_un_mes_atras = datetime.now() - timedelta(days=30)
-        ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).aggregate(
-            total_ingresos=Sum('detallepedido__cantidad') * F('detallepedido__producto__precio'))['total_ingresos']
+            # Ingresos del último mes
+            fecha_un_mes_atras = datetime.now() - timedelta(days=30)
+            ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).aggregate(
+                total_ingresos=Sum('detallepedido__cantidad') * F('detallepedido__producto__precio'))['total_ingresos']
 
-        # Ciudad con más pedidos
-        ciudad_mas_pedidos = Pedido.objects.values('cliente__ciudad').annotate(
-            total=Count('cliente__ciudad')).order_by('-total').first()
+            # Ciudad con más pedidos
+            ciudad_mas_pedidos = Pedido.objects.values('cliente__ciudad').annotate(
+                total=Count('cliente__ciudad')).order_by('-total').first()
 
-        # Producto más vendido
-        producto_mas_vendido = DetallePedido.objects.values(
-            'producto__nombre').annotate(total=Sum('cantidad')).order_by('-total').first()
+            # Producto más vendido
+            producto_mas_vendido = DetallePedido.objects.values(
+                'producto__nombre').annotate(total=Sum('cantidad')).order_by('-total').first()
 
-        return Response({
-            'numero_de_pedidos': num_pedidos,
-            'numero_de_clientes': num_clientes,
-            'ingresos_del_ultimo_mes': ingresos_ultimo_mes,
-            'ciudad_con_mas_pedidos': ciudad_mas_pedidos,
-            'producto_mas_vendido': producto_mas_vendido
-        })
+            return Response({
+                'numero_de_pedidos': num_pedidos,
+                'numero_de_clientes': num_clientes,
+                'ingresos_del_ultimo_mes': ingresos_ultimo_mes,
+                'ciudad_con_mas_pedidos': ciudad_mas_pedidos,
+                'producto_mas_vendido': producto_mas_vendido
+            })
+        except Exception as e:
+            raise APIException(
+                str(e), code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class ResumenView(APIView):
+#     def get(self, request):
+#         # Número de pedidos
+#         num_pedidos = Pedido.objects.count()
+
+#         # Número de clientes
+#         num_clientes = Cliente.objects.count()
+
+#         # Ingresos del último mes
+#         fecha_un_mes_atras = datetime.now() - timedelta(days=30)
+#         ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).aggregate(
+#             total_ingresos=Sum('detallepedido__cantidad') * F('detallepedido__producto__precio'))['total_ingresos']
+
+#         # Ciudad con más pedidos
+#         ciudad_mas_pedidos = Pedido.objects.values('cliente__ciudad').annotate(
+#             total=Count('cliente__ciudad')).order_by('-total').first()
+
+#         # Producto más vendido
+#         producto_mas_vendido = DetallePedido.objects.values(
+#             'producto__nombre').annotate(total=Sum('cantidad')).order_by('-total').first()
+
+#         return Response({
+#             'numero_de_pedidos': num_pedidos,
+#             'numero_de_clientes': num_clientes,
+#             'ingresos_del_ultimo_mes': ingresos_ultimo_mes,
+#             'ciudad_con_mas_pedidos': ciudad_mas_pedidos,
+#             'producto_mas_vendido': producto_mas_vendido
+#         })
