@@ -55,3 +55,8 @@ Quien puede ver esto, o si debemos enviar una serie de autenticacion
 - api/productos
 - api/pedidos
 - api/resumen
+
+- https://server-pyme-desk.onrender.com/api/clientes/
+- https://server-pyme-desk.onrender.com/api/productos/
+- https://server-pyme-desk.onrender.com/api/pedidos/
+- https://server-pyme-desk.onrender.com/api/resumen/
