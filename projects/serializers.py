@@ -23,8 +23,21 @@ class DetallePedidoSerializer(serializers.ModelSerializer):
         }
 
 
+# class PedidoSerializer(serializers.ModelSerializer):
+#     productos = DetallePedidoSerializer(
+#         source='detallepedido_set', many=True, read_only=True)
+
+#     class Meta:
+#         model = Pedido
+#         fields = '__all__'
+
+#     def create(self, validated_data):
+#         productos_data = validated_data.pop('productos', [])
+#         pedido = Pedido.objects.create(**validated_data)
+#         for producto_data in productos_data:
+#             DetallePedido.objects.create(pedido=pedido, **producto_data)
+#         return pedido
 class PedidoSerializer(serializers.ModelSerializer):
-    # productos = DetallePedidoSerializer(many=True, write_only=True)
     productos = DetallePedidoSerializer(
         source='detallepedido_set', many=True, read_only=True)
 
@@ -33,8 +46,17 @@ class PedidoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        productos_data = validated_data.pop('productos', [])
+        # Asumiendo que estás enviando los productos como parte de la petición POST
+        # en un campo llamado 'productos_data'.
+        productos_data = self.context['request'].data.get('productos', [])
         pedido = Pedido.objects.create(**validated_data)
+
+        # Ahora, para cada producto en productos_data, crea un DetallePedido.
         for producto_data in productos_data:
-            DetallePedido.objects.create(pedido=pedido, **producto_data)
+            producto_id = producto_data.get('producto')
+            cantidad = producto_data.get('cantidad')
+            producto = Producto.objects.get(id=producto_id)
+            DetallePedido.objects.create(
+                pedido=pedido, producto=producto, cantidad=cantidad)
+
         return pedido
