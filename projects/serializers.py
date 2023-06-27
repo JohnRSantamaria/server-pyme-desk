@@ -1,12 +1,5 @@
-from .models import Cliente, Producto, Pedido, DetallePedido, Project
+from .models import Cliente, Producto, Pedido, DetallePedido
 from rest_framework import serializers
-
-
-class ProjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = ('id', 'title', 'description', 'tecnology', 'created_at')
-        read_only_fields = ('created_at',)
 
 
 class ClienteSerializer(serializers.ModelSerializer):
@@ -25,6 +18,7 @@ class DetallePedidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetallePedido
         fields = '__all__'
+        read_only_fields = ('fecha')
 
 
 class PedidoSerializer(serializers.ModelSerializer):

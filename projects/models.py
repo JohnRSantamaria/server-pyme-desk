@@ -3,13 +3,6 @@ from django.db import models
 # Create your models here.
 
 
-class Project(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    tecnology = models.CharField(max_length=200)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)
     celular = models.CharField(max_length=20)
@@ -20,6 +13,8 @@ class Cliente(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
+    precio = models.DecimalField(
+        max_digits=10, decimal_places=2)  # Precio del producto
 
 
 class Pedido(models.Model):
@@ -46,3 +41,7 @@ class DetallePedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
+
+    @property
+    def precio_total(self):
+        return self.cantidad * self.producto.precio
