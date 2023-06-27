@@ -19,3 +19,4 @@ tzdata==2023.3
 ujson==5.8.0
 virtualenv==20.23.1
 websockets==11.0.3
+whitenoise==6.5.0
