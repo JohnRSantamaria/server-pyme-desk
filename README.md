@@ -153,3 +153,11 @@ Quien puede ver esto, o si debemos enviar una serie de autenticacion
 	}
 ]
 ```
+
+### Paginacion
+
+http://example.com/api/pedidos/?page=2
+
+#### cambiar el limite
+
+http://example.com/api/mi_endpoint/?page_size=20

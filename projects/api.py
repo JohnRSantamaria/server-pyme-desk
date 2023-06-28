@@ -4,16 +4,22 @@ from .serializers import ClienteSerializer, ProductoSerializer, PedidoSerializer
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count, Sum, F, ExpressionWrapper, DecimalField
 from datetime import datetime, timedelta
 # filter
 from django_filters.rest_framework import DjangoFilterBackend
 
 
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size_query_param = 'page_size'
+
+
 class ClienteViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = ClienteSerializer
+    pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['ciudad',]
 
@@ -22,6 +28,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = ProductoSerializer
+    pagination_class = CustomPageNumberPagination
 
     def create(self, request, *args, **kwargs):
         # Verificar si el producto ya existe
@@ -37,6 +44,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = PedidoSerializer
+    pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id', 'estado', 'pagado',
                         'regla_envio', 'cliente']
