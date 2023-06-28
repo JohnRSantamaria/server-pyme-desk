@@ -38,7 +38,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = PedidoSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'estado', 'pagado']
+    filterset_fields = ['id', 'estado', 'pagado',
+                        'regla_envio', 'cliente']
 
 
 class ResumenView(APIView):
