@@ -49,6 +49,30 @@ class PedidoViewSet(viewsets.ModelViewSet):
     filterset_fields = ['id', 'estado', 'pagado',
                         'regla_envio', 'cliente']
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        # Itera sobre los pedidos serializados
+        for pedido_data in serializer.data:
+            # Obtén los IDs de productos y cliente del pedido actual
+            productos_ids = [detalle['producto']
+                             for detalle in pedido_data['productos']]
+            cliente_id = pedido_data['cliente']
+
+            # Obtén los nombres de los productos y el cliente asociado
+            productos = Producto.objects.filter(id__in=productos_ids)
+            cliente = Cliente.objects.get(id=cliente_id)
+
+            # Agrega los nombres de los productos al pedido_data
+            pedido_data['productos_nombres'] = [
+                producto.nombre for producto in productos]
+
+            # Agrega el nombre del cliente al pedido_data
+            pedido_data['cliente_nombre'] = cliente.nombre
+
+        return Response(serializer.data)
+
 
 class ResumenView(APIView):
     def get(self, request):
@@ -60,11 +84,6 @@ class ResumenView(APIView):
 
         # Ingresos del último mes
         fecha_un_mes_atras = datetime.now() - timedelta(days=30)
-
-        # ingresos_ultimo_mes = Pedido.objects.filter(fecha__gte=fecha_un_mes_atras, pagado=True).annotate(
-        #     ingreso_por_producto=ExpressionWrapper(F('detallepedido__cantidad') * F(
-        #         'detallepedido__producto__precio'), output_field=DecimalField())
-        # ).aggregate(total_ingresos=Sum('ingreso_por_producto'))['total_ingresos']
 
         # Ingresos del último mes
         fecha_un_mes_atras = datetime.now() - timedelta(days=30)
