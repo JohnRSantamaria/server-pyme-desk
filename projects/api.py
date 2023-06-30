@@ -46,31 +46,35 @@ class PedidoViewSet(viewsets.ModelViewSet):
     serializer_class = PedidoSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'estado', 'pagado',
-                        'regla_envio', 'cliente']
+    filterset_fields = ['id', 'estado', 'pagado', 'regla_envio', 'cliente']
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            # Itera sobre los pedidos serializados
+            for pedido_data in serializer.data:
+                # Obtén los IDs de productos y cliente del pedido actual
+                productos_ids = [detalle['producto']
+                                 for detalle in pedido_data['productos']]
+                cliente_id = pedido_data['cliente']
+
+                # Obtén los nombres de los productos y el cliente asociado
+                productos = Producto.objects.filter(id__in=productos_ids)
+                cliente = Cliente.objects.get(id=cliente_id)
+
+                # Agrega los nombres de los productos al pedido_data
+                pedido_data['productos_nombres'] = [
+                    producto.nombre for producto in productos]
+
+                # Agrega el nombre del cliente al pedido_data
+                pedido_data['cliente_nombre'] = cliente.nombre
+
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(queryset, many=True)
-
-        # Itera sobre los pedidos serializados
-        for pedido_data in serializer.data:
-            # Obtén los IDs de productos y cliente del pedido actual
-            productos_ids = [detalle['producto']
-                             for detalle in pedido_data['productos']]
-            cliente_id = pedido_data['cliente']
-
-            # Obtén los nombres de los productos y el cliente asociado
-            productos = Producto.objects.filter(id__in=productos_ids)
-            cliente = Cliente.objects.get(id=cliente_id)
-
-            # Agrega los nombres de los productos al pedido_data
-            pedido_data['productos_nombres'] = [
-                producto.nombre for producto in productos]
-
-            # Agrega el nombre del cliente al pedido_data
-            pedido_data['cliente_nombre'] = cliente.nombre
-
         return Response(serializer.data)
 
 
